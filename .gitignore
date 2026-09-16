@@ -1,0 +1,7 @@
+output/*.jpg
+output/*.png
+output/results.csv
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
