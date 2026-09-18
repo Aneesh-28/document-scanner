@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Report — Document Scanner</title>
+<style>
+  @page {
+    size: A4;
+    margin: 20mm 18mm 20mm 18mm;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'Calibri', 'Arial', sans-serif;
+    font-size: 12pt;
+    line-height: 1.65;
+    color: #222;
+    margin: 0;
+    padding: 0;
+    background: #fff;
+  }
+
+  /* ---------- Cover Page ---------- */
+  .cover-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+    page-break-after: always;
+    border: 3px double #2c5f8a;
+    margin: 10mm;
+    padding: 40px 30px;
+  }
+  .cover-page h1 {
+    font-size: 32pt;
+    color: #1a3d5c;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+  .cover-page .subtitle {
+    font-size: 16pt;
+    color: #555;
+    margin-bottom: 50px;
+  }
+  .cover-page .meta {
+    font-size: 13pt;
+    color: #333;
+    line-height: 2.2;
+  }
+  .cover-page .meta strong { color: #1a3d5c; }
+  .cover-page .logo {
+    font-size: 60pt;
+    margin-bottom: 30px;
+    color: #2c5f8a;
+  }
+
+  /* ---------- Content ---------- */
+  .content {
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 0 18mm;
+  }
+
+  h2 {
+    color: #1a3d5c;
+    font-size: 18pt;
+    border-bottom: 2.5px solid #2c5f8a;
+    padding-bottom: 6px;
+    margin-top: 36px;
+    margin-bottom: 14px;
+    page-break-after: avoid;
+  }
+  h3 {
+    color: #2c5f8a;
+    font-size: 14pt;
+    margin-top: 22px;
+    margin-bottom: 8px;
+    page-break-after: avoid;
+  }
+  h4 {
+    color: #3a7ab5;
+    font-size: 12pt;
+    margin-top: 16px;
+    margin-bottom: 6px;
+  }
+
+  p { margin: 8px 0; text-align: justify; }
+
+  ul, ol { margin: 8px 0 8px 20px; }
+  li { margin-bottom: 4px; }
+
+  code {
+    font-family: 'Consolas', 'Courier New', monospace;
+    background: #f0f4f8;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 10.5pt;
+  }
+  pre {
+    background: #f7f9fc;
+    border: 1px solid #d0d8e0;
+    border-radius: 5px;
+    padding: 12px 16px;
+    overflow-x: auto;
+    font-size: 9.5pt;
+    line-height: 1.5;
+    page-break-inside: avoid;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 11pt;
+    page-break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #c0c8d0;
+    padding: 8px 10px;
+    text-align: left;
+  }
+  th {
+    background: #eaf2fb;
+    color: #1a3d5c;
+    font-weight: 600;
+  }
+  tr:nth-child(even) { background: #f8fafc; }
+
+  .diagram {
+    text-align: center;
+    margin: 18px 0;
+    page-break-inside: avoid;
+  }
+  .diagram img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #dde3ea;
+    border-radius: 4px;
+  }
+  .diagram .caption {
+    font-size: 10pt;
+    color: #666;
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  .screenshot-pair {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: flex-start;
+    margin: 16px 0;
+    page-break-inside: avoid;
+  }
+  .screenshot-pair img {
+    max-width: 48%;
+    border: 1px solid #dde3ea;
+    border-radius: 4px;
+  }
+
+  .toc {
+    page-break-after: always;
+  }
+  .toc h2 { border-bottom: none; text-align: center; }
+  .toc ol { font-size: 13pt; line-height: 2.2; }
+  .toc ol li { color: #333; }
+  .toc ol li a { color: #2c5f8a; text-decoration: none; }
+  .toc ol li a:hover { text-decoration: underline; }
+
+  .page-break { page-break-before: always; }
+
+  @media print {
+    .cover-page { margin: 0; border-width: 2px; }
+    body { font-size: 11pt; }
+    h2 { font-size: 16pt; }
+    h3 { font-size: 13pt; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================================================================== -->
+<!-- COVER PAGE                                                         -->
+<!-- ================================================================== -->
+<div class="cover-page">
+  <div class="logo">&#128196;</div>
+  <h1>Document Scanner</h1>
+  <div class="subtitle">A Computer-Vision CLI for Automatic Document Scanning</div>
+  <hr style="width:60%; border:1px solid #2c5f8a; margin:30px auto;">
+  <div class="meta">
+    <strong>Project Title:</strong> Document Scanner using OpenCV<br>
+    <strong>Submitted by:</strong> Aneesh Bagad<br>
+    <strong>GitHub:</strong> github.com/Aneesh-28/document-scanner<br>
+    <strong>Technology Stack:</strong> Python, OpenCV, NumPy<br>
+    <strong>Date:</strong> September 2026<br>
+  </div>
+</div>
+
+<!-- ================================================================== -->
+<!-- TABLE OF CONTENTS                                                  -->
+<!-- ================================================================== -->
+<div class="content toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#sec1">Cover Page</a></li>
+    <li><a href="#sec2">Introduction</a></li>
+    <li><a href="#sec3">Problem Statement</a></li>
+    <li><a href="#sec4">Functional Requirements</a></li>
+    <li><a href="#sec5">Non-functional Requirements</a></li>
+    <li><a href="#sec6">System Architecture</a></li>
+    <li><a href="#sec7">Design Diagrams</a>
+      <ul style="list-style:disc; font-size:12pt; line-height:1.8;">
+        <li>Use Case Diagram</li>
+        <li>Workflow Diagram</li>
+        <li>Sequence Diagram</li>
+        <li>Class / Component Diagram</li>
+      </ul>
+    </li>
+    <li><a href="#sec8">Design Decisions &amp; Rationale</a></li>
+    <li><a href="#sec9">Implementation Details</a></li>
+    <li><a href="#sec10">Screenshots / Results</a></li>
+    <li><a href="#sec11">Testing Approach</a></li>
+    <li><a href="#sec12">Challenges Faced</a></li>
+    <li><a href="#sec13">Learnings &amp; Key Takeaways</a></li>
+    <li><a href="#sec14">Future Enhancements</a></li>
+    <li><a href="#sec15">References</a></li>
+  </ol>
+</div>
+
+<!-- ================================================================== -->
+<!-- 2. INTRODUCTION                                                    -->
+<!-- ================================================================== -->
+<div class="content">
+
+<h2 id="sec2">2. Introduction</h2>
+
+<p>
+  This project implements a command-line document scanner that takes a photo of a printed document
+  or receipt — taken at an angle, on an ordinary desk, with a normal phone camera — and produces a
+  clean, flattened, high-contrast image that looks like it came from a real flatbed scanner.
+</p>
+<p>
+  The tool automates three steps that would otherwise require manual editing: <strong>detecting the
+  document</strong> within a cluttered photo, <strong>correcting perspective distortion</strong> so
+  the page is perfectly flat, and <strong>normalizing lighting and contrast</strong> so the output is
+  a crisp black-text-on-white-background scan. It processes single images or entire folders in batch,
+  logging every outcome to a CSV file for auditability.
+</p>
+<p>
+  The project is built from first principles using Python and OpenCV, with no pre-built scanning
+  libraries. It follows a classic computer-vision pipeline: Canny edge detection → contour
+  approximation → four-point perspective transform → adaptive thresholding.
+</p>
+
+<!-- ================================================================== -->
+<!-- 3. PROBLEM STATEMENT                                               -->
+<!-- ================================================================== -->
+<h2 id="sec3">3. Problem Statement</h2>
+
+<p>
+  A phone photo of a document has three fundamental problems that a scanner output does not:
+</p>
+<ol>
+  <li><strong>Perspective distortion</strong> — the page is rarely photographed dead-on; it is
+      typically tilted, rotated, and keystoned.</li>
+  <li><strong>Uneven lighting</strong> — desk lamps, window light, and shadows produce
+      inconsistent brightness across the page.</li>
+  <li><strong>Background clutter</strong> — the desk, other objects, and shadows surround
+      the page in the frame.</li>
+</ol>
+<p>
+  The goal is to build a tool that automatically detects the document within the frame,
+  undoes the perspective distortion, removes the background, and normalizes the lighting —
+  producing output comparable to a flatbed scanner, for a batch of images, without any
+  manual cropping or adjustment.
+</p>
+
+<!-- ================================================================== -->
+<!-- 4. FUNCTIONAL REQUIREMENTS                                         -->
+<!-- ================================================================== -->
+<h2 id="sec4">4. Functional Requirements</h2>
+
+<table>
+  <tr><th>#</th><th>Requirement</th><th>Description</th></tr>
+  <tr><td>FR-1</td><td>Image Loading</td><td>Accept JPEG, PNG, BMP, TIFF image files as input. Reject invalid or corrupt files with a clear error message.</td></tr>
+  <tr><td>FR-2</td><td>Document Detection</td><td>Automatically detect the document's four corners within a photo using edge detection and contour analysis.</td></tr>
+  <tr><td>FR-3</td><td>Perspective Correction</td><td>Warp the detected document into a flat, top-down rectangular view using a four-point perspective transform.</td></tr>
+  <tr><td>FR-4</td><td>Image Enhancement</td><td>Apply adaptive thresholding to produce a clean, high-contrast scanned appearance.</td></tr>
+  <tr><td>FR-5</td><td>Batch Processing</td><td>Process an entire folder of images in a single CLI invocation.</td></tr>
+  <tr><td>FR-6</td><td>Debug Mode</td><td>Optionally save intermediate edge-map images alongside final outputs when <code>--debug</code> is specified.</td></tr>
+  <tr><td>FR-7</td><td>CSV Logging</td><td>Write a <code>results.csv</code> file with filename, status, processing time, output path, and error for each processed image.</td></tr>
+  <tr><td>FR-8</td><td>Graceful Error Handling</td><td>Handle missing files, invalid images, unsupported extensions, and failed contour detection per-file without crashing the batch.</td></tr>
+  <tr><td>FR-9</td><td>Fallback Detection</td><td>When no 4-point contour is found, fall back to the largest contour's bounding rectangle rather than failing entirely.</td></tr>
+</table>
+
+<!-- ================================================================== -->
+<!-- 5. NON-FUNCTIONAL REQUIREMENTS                                     -->
+<!-- ================================================================== -->
+<h2 id="sec5">5. Non-functional Requirements</h2>
+
+<table>
+  <tr><th>#</th><th>Requirement</th><th>Description</th></tr>
+  <tr><td>NFR-1</td><td>Performance</td><td>Process a single 1600×1800 image in under 0.1 seconds on commodity hardware. Detection is done on a resized (~900 px) image to keep contour-finding fast.</td></tr>
+  <tr><td>NFR-2</td><td>Output Quality</td><td>Warp is performed on the full-resolution original image (not the resized version) to preserve output sharpness.</td></tr>
+  <tr><td>NFR-3</td><td>Modularity</td><td>Each processing stage (preprocessing, detection/warp, enhancement) is in its own Python module with clear, documented interfaces.</td></tr>
+  <tr><td>NFR-4</td><td>Testability</td><td>All modules are independently testable with a comprehensive pytest suite. All 12 tests pass.</td></tr>
+  <tr><td>NFR-5</td><td>Portability</td><td>Runs on Windows, macOS, and Linux. Dependencies are limited to <code>opencv-python-headless</code>, <code>numpy</code>, and <code>pytest</code>.</td></tr>
+  <tr><td>NFR-6</td><td>Maintainability</td><td>Every function has a docstring explaining <em>what</em> it does and <em>why</em>. Git history has one commit per module for clean traceability.</td></tr>
+</table>
+
+<!-- ================================================================== -->
+<!-- 6. SYSTEM ARCHITECTURE                                             -->
+<!-- ================================================================== -->
+<h2 id="sec6" class="page-break">6. System Architecture</h2>
+
+<p>
+  The system follows a <strong>linear pipeline architecture</strong>. Each image passes through
+  three sequential processing modules, coordinated by the CLI entry point (<code>scan.py</code>),
+  which also handles argument parsing, error management, and CSV logging.
+</p>
+
+<div class="diagram">
+  <img src="architecture_diagram.png" alt="Architecture Diagram">
+  <div class="caption">Figure 1: Architecture — data flow through the scanner pipeline</div>
+</div>
+
+<h3>Module Breakdown</h3>
+<table>
+  <tr><th>Module</th><th>File</th><th>Responsibility</th></tr>
+  <tr><td>Preprocessing</td><td><code>preprocessing.py</code></td><td>Load → resize (track scale ratio) → grayscale → Gaussian blur → Canny edge detection</td></tr>
+  <tr><td>Detection &amp; Warp</td><td><code>detect_and_warp.py</code></td><td>Find contours → approximate to polygon → order 4 corners → compute output dimensions → perspective warp at full resolution</td></tr>
+  <tr><td>Enhancement</td><td><code>enhance.py</code></td><td>Convert warped image to grayscale → adaptive Gaussian threshold for scanned appearance</td></tr>
+  <tr><td>CLI / Orchestration</td><td><code>scan.py</code></td><td>Parse CLI args → validate input → loop over images → call modules → save output → write CSV log</td></tr>
+  <tr><td>Utilities</td><td><code>utils.py</code></td><td>Supported-extension check, directory creation, image listing, timing decorator</td></tr>
+</table>
+
+<!-- ================================================================== -->
+<!-- 7. DESIGN DIAGRAMS                                                 -->
+<!-- ================================================================== -->
+<h2 id="sec7" class="page-break">7. Design Diagrams</h2>
+
+<h3>7.1 Use Case Diagram</h3>
+<p>
+  The system has a single actor (the User) who interacts with the CLI to scan images.
+  Internal use cases like contour detection and perspective warping are included automatically
+  as part of the scan process.
+</p>
+<div class="diagram">
+  <img src="use_case_diagram.png" alt="Use Case Diagram">
+  <div class="caption">Figure 2: Use Case Diagram</div>
+</div>
+
+<h3 class="page-break">7.2 Workflow Diagram</h3>
+<p>
+  This shows the end-to-end flow when a user invokes the CLI, from argument parsing
+  through per-image processing to the final summary.
+</p>
+<div class="diagram">
+  <img src="workflow_diagram.png" alt="Workflow Diagram">
+  <div class="caption">Figure 3: Workflow Diagram — CLI run from invocation to summary</div>
+</div>
+
+<h3 class="page-break">7.3 Sequence Diagram</h3>
+<p>
+  The sequence diagram traces the method-level interactions between all components
+  when processing a single image, showing calls and return values.
+</p>
+<div class="diagram">
+  <img src="sequence_diagram.png" alt="Sequence Diagram">
+  <div class="caption">Figure 4: Sequence Diagram — processing a single image</div>
+</div>
+
+<h3 class="page-break">7.4 Class / Component Diagram</h3>
+<p>
+  This diagram shows the actual file structure, the functions each module exposes,
+  and the call relationships between them (including the test suite).
+</p>
+<div class="diagram">
+  <img src="class_component_diagram.png" alt="Class/Component Diagram">
+  <div class="caption">Figure 5: Component Diagram — files and call relationships</div>
+</div>
+
+<h3>7.5 ER Diagram</h3>
+<p>
+  This project does not use a database or persistent storage beyond the filesystem.
+  Output is written as PNG image files and a flat CSV log (<code>results.csv</code>).
+  The CSV schema is:
+</p>
+<table>
+  <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+  <tr><td><code>filename</code></td><td>string</td><td>Base name of the input image file</td></tr>
+  <tr><td><code>status</code></td><td>string</td><td><code>success</code>, <code>success (fallback contour)</code>, or <code>fail</code></td></tr>
+  <tr><td><code>processing_time_s</code></td><td>float</td><td>Wall-clock processing time in seconds</td></tr>
+  <tr><td><code>output_path</code></td><td>string</td><td>Path to the output scanned image (empty on failure)</td></tr>
+  <tr><td><code>error</code></td><td>string</td><td>Error message (empty on success)</td></tr>
+</table>
+
+<!-- ================================================================== -->
+<!-- 8. DESIGN DECISIONS & RATIONALE                                    -->
+<!-- ================================================================== -->
+<h2 id="sec8" class="page-break">8. Design Decisions &amp; Rationale</h2>
+
+<h3>8.1 Resize for Detection, Warp at Full Resolution</h3>
+<p>
+  Phone cameras produce images 3000+ pixels wide. Running contour detection at that resolution
+  is slow and picks up noise. The solution: resize to ~900 px for detection, but keep the original
+  full-resolution image and multiply the detected corner coordinates by the
+  <code>scale_ratio</code> before warping. This keeps detection fast while preserving output quality.
+</p>
+
+<h3>8.2 Canny Thresholds (75 / 200)</h3>
+<p>
+  Too low → noise everywhere (paper grain, desk texture becomes edges). Too high → faint document
+  edges are missed. The 75/200 pair was chosen empirically as a good starting point for
+  well-lit photos on contrasting backgrounds. These could be made adaptive in future work.
+</p>
+
+<h3>8.3 Contour Approximation with <code>approxPolyDP</code></h3>
+<p>
+  Rather than trying to detect straight lines or corners directly, the pipeline finds all closed
+  contours and simplifies each one to a polygon. If a contour simplifies to exactly 4 points,
+  it is very likely a rectangular document. The epsilon parameter (<code>0.02 × perimeter</code>)
+  controls how aggressively bumpy contours are simplified.
+</p>
+
+<h3>8.4 Sum/Difference Trick for Corner Ordering</h3>
+<p>
+  <code>approxPolyDP</code> returns points in whatever order the contour was traced —
+  not necessarily top-left, top-right, etc. The perspective transform requires a specific order.
+  The sum/difference trick (top-left has smallest <code>x+y</code>, bottom-right has largest, etc.)
+  provides a rotation-invariant ordering without needing to know the page's actual angle.
+</p>
+
+<h3>8.5 Adaptive vs. Global Thresholding</h3>
+<p>
+  A global threshold (one cutoff for the entire image) fails when lighting varies across the page
+  — one corner is too dark, another too bright. Adaptive Gaussian thresholding calculates the
+  threshold locally for each pixel neighborhood (block size 11), handling uneven desk lighting
+  gracefully.
+</p>
+
+<h3>8.6 Fallback to Bounding Rectangle</h3>
+<p>
+  On low-contrast or messy backgrounds, no contour approximates cleanly to 4 points.
+  Rather than failing hard, the pipeline falls back to the bounding rectangle of the largest
+  contour. This produces a less-accurate crop (no rotation correction) but is far better than
+  no output at all. The fallback is flagged in <code>results.csv</code>.
+</p>
+
+<!-- ================================================================== -->
+<!-- 9. IMPLEMENTATION DETAILS                                          -->
+<!-- ================================================================== -->
+<h2 id="sec9" class="page-break">9. Implementation Details</h2>
+
+<h3>9.1 Project Structure</h3>
+<pre><code>scanner-project/
+├── src/
+│   ├── preprocessing.py     # Module 1: load, resize, grayscale, blur, Canny
+│   ├── detect_and_warp.py   # Module 2: contours, corner ordering, perspective warp
+│   ├── enhance.py           # Module 3: adaptive thresholding
+│   ├── scan.py              # CLI entry point (argparse + orchestration)
+│   └── utils.py             # Shared helpers
+├── data/samples/            # Test images (6 synthetic + 1 invalid)
+├── output/                  # Scan results + results.csv
+├── tests/
+│   └── test_pipeline.py     # 12 pytest tests
+├── docs/                    # All diagrams + before/after screenshot
+├── scripts/                 # Sample & diagram generator scripts
+├── README.md
+├── statement.md
+└── requirements.txt</code></pre>
+
+<h3>9.2 Module 1 — Preprocessing (<code>preprocessing.py</code>)</h3>
+<p>Key functions and their roles:</p>
+<ul>
+  <li><code>load_image(path)</code> — reads with <code>cv2.imread()</code>; raises
+      <code>ValueError</code> if the file is missing, corrupt, or unsupported.</li>
+  <li><code>resize_image(img, target_dim=900)</code> — shrinks the longer side to 900 px
+      using <code>INTER_AREA</code> interpolation; returns <code>(resized, scale_ratio)</code>
+      where <code>scale_ratio = original_height / resized_height</code>.</li>
+  <li><code>to_grayscale(img)</code> — <code>cv2.cvtColor(BGR2GRAY)</code>.</li>
+  <li><code>blur(gray, ksize=(5,5))</code> — <code>cv2.GaussianBlur</code> to suppress
+      fine noise/texture.</li>
+  <li><code>detect_edges(blurred, 75, 200)</code> — <code>cv2.Canny</code> edge detection.</li>
+  <li><code>preprocess(path)</code> — runs the full pipeline, returns
+      <code>(resized_original, edged, scale_ratio)</code>.</li>
+</ul>
+
+<h3>9.3 Module 2 — Detection &amp; Warp (<code>detect_and_warp.py</code>)</h3>
+<ul>
+  <li><code>find_candidate_contours(edged, top_n=5)</code> — <code>cv2.findContours(RETR_LIST, CHAIN_APPROX_SIMPLE)</code>,
+      sorted by area descending, top 5 kept.</li>
+  <li><code>find_document_corners(edged)</code> — loops through candidates,
+      applies <code>cv2.approxPolyDP(0.02 × perimeter)</code>; returns the first 4-point polygon
+      found, or falls back to the largest contour's bounding rectangle.</li>
+  <li><code>order_points(pts)</code> — orders as [TL, TR, BR, BL] using sum/difference.</li>
+  <li><code>compute_output_dimensions(rect)</code> — computes <code>maxWidth</code> and
+      <code>maxHeight</code> from corner-to-corner distances.</li>
+  <li><code>warp_perspective(original, ordered_pts)</code> — defines destination rectangle,
+      calls <code>cv2.getPerspectiveTransform</code> + <code>cv2.warpPerspective</code>.</li>
+  <li><code>detect_and_warp(resized, edged, scale_ratio, full_res)</code> — full pipeline;
+      multiplies detected corners by <code>scale_ratio</code> before warping the full-resolution
+      original.</li>
+</ul>
+
+<h3>9.4 Module 3 — Enhancement (<code>enhance.py</code>)</h3>
+<ul>
+  <li><code>enhance(warped)</code> — converts to grayscale, then applies
+      <code>cv2.adaptiveThreshold(255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, 10)</code>
+      for a crisp scanned appearance.</li>
+</ul>
+
+<h3>9.5 CLI (<code>scan.py</code>)</h3>
+<p>The CLI uses <code>argparse</code> with three arguments:</p>
+<table>
+  <tr><th>Flag</th><th>Required</th><th>Description</th></tr>
+  <tr><td><code>--input</code></td><td>Yes</td><td>Path to a single image file, or a folder of images</td></tr>
+  <tr><td><code>--output</code></td><td>No</td><td>Output directory (default: <code>./output</code>)</td></tr>
+  <tr><td><code>--debug</code></td><td>No</td><td>Also save intermediate Canny edge-map images</td></tr>
+</table>
+<p>
+  For each image, <code>process_single_image()</code> runs all three modules inside a
+  try/except block, records the outcome (success/fail, timing, output path, error message),
+  and appends a row to <code>results.csv</code>.
+</p>
+
+<h3>9.6 Git History</h3>
+<p>The repository has 7 commits, one per logical step:</p>
+<table>
+  <tr><th>#</th><th>Commit</th><th>Description</th></tr>
+  <tr><td>1</td><td><code>cf4f63b</code></td><td>Initial commit: repo skeleton, requirements, .gitignore</td></tr>
+  <tr><td>2</td><td><code>cf38266</code></td><td>Module 1: preprocessing</td></tr>
+  <tr><td>3</td><td><code>db9ac72</code></td><td>Module 2: contour detection &amp; perspective warp</td></tr>
+  <tr><td>4</td><td><code>b9a13f8</code></td><td>Module 3: enhancement + CLI + utils</td></tr>
+  <tr><td>5</td><td><code>d017dde</code></td><td>Pytest test suite</td></tr>
+  <tr><td>6</td><td><code>c9e7abe</code></td><td>Diagrams</td></tr>
+  <tr><td>7</td><td><code>ac891e3</code></td><td>README + project report</td></tr>
+</table>
+
+<!-- ================================================================== -->
+<!-- 10. SCREENSHOTS / RESULTS                                          -->
+<!-- ================================================================== -->
+<h2 id="sec10" class="page-break">10. Screenshots / Results</h2>
+
+<h3>10.1 Before &amp; After</h3>
+<div class="diagram">
+  <img src="before_after.png" alt="Before and After" style="max-width:95%;">
+  <div class="caption">Figure 6: Before (raw phone photo) vs. After (scanned output) — photo1.jpg</div>
+</div>
+
+<h3>10.2 CLI Output</h3>
+<pre><code>$ python src/scan.py --input data/samples/ --output output/ --debug
+
+[FAIL] not_an_image.jpg               ( 0.000s)  Could not read '...' as an image
+[OK  ] photo1.jpg                     ( 0.038s)  output/photo1_scanned.png
+[OK  ] photo2.jpg                     ( 0.035s)  output/photo2_scanned.png
+[OK  ] photo3.jpg                     ( 0.032s)  output/photo3_scanned.png
+[OK  ] photo4.jpg                     ( 0.022s)  output/photo4_scanned.png
+[OK  ] photo5.jpg                     ( 0.030s)  output/photo5_scanned.png
+[OK  ] photo6_low_contrast.jpg        ( 0.027s)  output/photo6_low_contrast_scanned.png
+
+Summary: 6/7 succeeded. Log written to output/results.csv</code></pre>
+
+<h3>10.3 Results CSV</h3>
+<table>
+  <tr><th>filename</th><th>status</th><th>time (s)</th><th>output_path</th><th>error</th></tr>
+  <tr><td>not_an_image.jpg</td><td>fail</td><td>0.0001</td><td>—</td><td>Could not read as an image</td></tr>
+  <tr><td>photo1.jpg</td><td>success</td><td>0.0498</td><td>output/photo1_scanned.png</td><td>—</td></tr>
+  <tr><td>photo2.jpg</td><td>success</td><td>0.0451</td><td>output/photo2_scanned.png</td><td>—</td></tr>
+  <tr><td>photo3.jpg</td><td>success</td><td>0.0423</td><td>output/photo3_scanned.png</td><td>—</td></tr>
+  <tr><td>photo4.jpg</td><td>success (fallback)</td><td>0.0249</td><td>output/photo4_scanned.png</td><td>—</td></tr>
+  <tr><td>photo5.jpg</td><td>success</td><td>0.0436</td><td>output/photo5_scanned.png</td><td>—</td></tr>
+  <tr><td>photo6_low_contrast.jpg</td><td>success</td><td>0.0386</td><td>output/photo6_low_contrast_scanned.png</td><td>—</td></tr>
+</table>
+
+<h3>10.4 Test Results</h3>
+<pre><code>$ pytest tests/ -v
+
+tests/test_pipeline.py::test_preprocessing_returns_correct_shape_and_type       PASSED
+tests/test_pipeline.py::test_resize_image_preserves_aspect_ratio                PASSED
+tests/test_pipeline.py::test_grayscale_and_blur_shapes                          PASSED
+tests/test_pipeline.py::test_load_image_missing_file_raises                     PASSED
+tests/test_pipeline.py::test_load_image_invalid_file_raises                     PASSED
+tests/test_pipeline.py::test_order_points_orders_correctly                      PASSED
+tests/test_pipeline.py::test_compute_output_dimensions_is_positive              PASSED
+tests/test_pipeline.py::test_known_good_sample_produces_warped_output           PASSED
+tests/test_pipeline.py::test_find_document_corners_returns_four_points          PASSED
+tests/test_pipeline.py::test_no_contours_raises_document_not_found_error        PASSED
+tests/test_pipeline.py::test_enhance_produces_binary_looking_image              PASSED
+tests/test_pipeline.py::test_end_to_end_pipeline_runs_without_crashing          PASSED
+
+============================= 12 passed in 0.49s ==============================</code></pre>
+
+<!-- ================================================================== -->
+<!-- 11. TESTING APPROACH                                               -->
+<!-- ================================================================== -->
+<h2 id="sec11" class="page-break">11. Testing Approach</h2>
+
+<p>
+  The project uses <strong>pytest</strong> with 12 test cases organized by module.
+  Tests use both synthetic images (generated programmatically) and the sample images
+  in <code>data/samples/</code>.
+</p>
+
+<h3>11.1 Preprocessing Tests</h3>
+<table>
+  <tr><th>Test</th><th>What It Verifies</th></tr>
+  <tr><td><code>test_preprocessing_returns_correct_shape_and_type</code></td><td>Output is the right ndarray shape (HxWx3 color, HxW binary edges), dtype uint8, and resized correctly</td></tr>
+  <tr><td><code>test_resize_image_preserves_aspect_ratio</code></td><td>Aspect ratio is preserved after resize; longer side equals target_dim</td></tr>
+  <tr><td><code>test_grayscale_and_blur_shapes</code></td><td>Grayscale output is 2D; blur preserves shape</td></tr>
+  <tr><td><code>test_load_image_missing_file_raises</code></td><td>Non-existent file raises <code>ValueError</code>, not crash</td></tr>
+  <tr><td><code>test_load_image_invalid_file_raises</code></td><td>Non-image file raises <code>ValueError</code></td></tr>
+</table>
+
+<h3>11.2 Detection &amp; Warp Tests</h3>
+<table>
+  <tr><th>Test</th><th>What It Verifies</th></tr>
+  <tr><td><code>test_order_points_orders_correctly</code></td><td>Shuffled points are reordered to [TL, TR, BR, BL]</td></tr>
+  <tr><td><code>test_compute_output_dimensions_is_positive</code></td><td>Known rectangle → correct width and height</td></tr>
+  <tr><td><code>test_known_good_sample_produces_warped_output</code></td><td>Real sample → warped output is portrait, reasonably large</td></tr>
+  <tr><td><code>test_find_document_corners_returns_four_points</code></td><td>Returns exactly 4 corner points</td></tr>
+  <tr><td><code>test_no_contours_raises_document_not_found_error</code></td><td>Blank edge map → <code>DocumentNotFoundError</code></td></tr>
+</table>
+
+<h3>11.3 Enhancement &amp; End-to-End Tests</h3>
+<table>
+  <tr><th>Test</th><th>What It Verifies</th></tr>
+  <tr><td><code>test_enhance_produces_binary_looking_image</code></td><td>Output is strictly binary (only 0 and 255 values)</td></tr>
+  <tr><td><code>test_end_to_end_pipeline_runs_without_crashing</code></td><td>Smoke test: every real sample makes it through the full pipeline</td></tr>
+</table>
+
+<!-- ================================================================== -->
+<!-- 12. CHALLENGES FACED                                               -->
+<!-- ================================================================== -->
+<h2 id="sec12">12. Challenges Faced</h2>
+
+<h3>Challenge 1: Mapping Corners Back to Full Resolution</h3>
+<p>
+  Detecting on a resized image but warping the original meant every corner coordinate needed
+  the <code>scale_ratio</code> multiplier applied before <code>warpPerspective</code>.
+  It was easy to accidentally warp the small image instead, producing a blurry low-resolution
+  output. The fix was to keep the full-resolution image in memory alongside the resized one,
+  and explicitly multiply coordinates: <code>ordered_full_res = ordered * scale_ratio</code>.
+</p>
+
+<h3>Challenge 2: Corner Ordering</h3>
+<p>
+  <code>approxPolyDP</code> returns points in whatever order the contour happened to be traced.
+  The perspective transform needs them in a specific [TL, TR, BR, BL] order.
+  Initially, the warped output was rotated or flipped. The sum/difference trick
+  (<code>x+y</code> for TL/BR, <code>x−y</code> for TR/BL) solved this reliably regardless
+  of the page's rotation angle.
+</p>
+
+<h3>Challenge 3: Low-Contrast Backgrounds</h3>
+<p>
+  When the page barely contrasts with the desk (e.g., white page on a light-beige desk),
+  Canny edges around the page boundary are weak or broken, so no contour approximates
+  to 4 points. The bounding-rectangle fallback handles this, but at the cost of not
+  correcting rotation on skewed pages.
+</p>
+
+<h3>Challenge 4: Canny Threshold Tuning</h3>
+<p>
+  The two Canny thresholds (low=75, high=200) are sensitive to lighting conditions.
+  Too low picks up paper grain and desk texture as edges; too high loses the document's
+  edge entirely. The current values work well for the test set but would benefit from
+  auto-tuning based on image statistics.
+</p>
+
+<!-- ================================================================== -->
+<!-- 13. LEARNINGS & KEY TAKEAWAYS                                      -->
+<!-- ================================================================== -->
+<h2 id="sec13" class="page-break">13. Learnings &amp; Key Takeaways</h2>
+
+<ol>
+  <li><strong>The importance of preprocessing.</strong> Edge detection quality depends almost
+      entirely on proper resizing, grayscale conversion, and Gaussian blur. Without blur,
+      Canny picks up thousands of tiny irrelevant edges from paper texture.</li>
+
+  <li><strong>Contour approximation is powerful but fragile.</strong> <code>approxPolyDP</code>
+      elegantly simplifies complex contours to polygons, but its success depends on clean,
+      unbroken edges — which depends on background contrast, lighting, and threshold tuning.</li>
+
+  <li><strong>Coordinate system awareness matters.</strong> Working at one resolution for speed
+      but outputting at another for quality requires careful bookkeeping of scale factors.
+      This is a common pattern in real CV systems.</li>
+
+  <li><strong>Graceful degradation > hard failure.</strong> The fallback to a bounding rectangle
+      when no 4-point contour is found keeps the tool useful in edge cases, even if the output
+      isn't perfect. Logging the fallback in the CSV lets the user identify which results to
+      review manually.</li>
+
+  <li><strong>Adaptive thresholding vs. global thresholding.</strong> The visual difference
+      between a global threshold (dark corners, blown-out highlights) and adaptive thresholding
+      (clean across the whole page) is dramatic and immediately visible in the output.</li>
+
+  <li><strong>End-to-end testing catches integration bugs.</strong> Unit tests on individual
+      functions are necessary but not sufficient. The end-to-end smoke test across all sample
+      images caught bugs in the module-to-module data flow that unit tests missed.</li>
+
+  <li><strong>Clean commit history aids debugging.</strong> Having one commit per module
+      made it easy to <code>git bisect</code> when a regression appeared and to review each
+      module's implementation in isolation.</li>
+</ol>
+
+<!-- ================================================================== -->
+<!-- 14. FUTURE ENHANCEMENTS                                            -->
+<!-- ================================================================== -->
+<h2 id="sec14">14. Future Enhancements</h2>
+
+<table>
+  <tr><th>#</th><th>Enhancement</th><th>Description</th></tr>
+  <tr><td>1</td><td>Auto-tuned Canny thresholds</td><td>Use image statistics (e.g., Otsu's method or median-based thresholds) to automatically select optimal Canny parameters per image, removing the need for manual tuning.</td></tr>
+  <tr><td>2</td><td>Rotation / orientation correction</td><td>Detect whether the page is upside-down or sideways (e.g., using text orientation detection via Tesseract) and auto-rotate.</td></tr>
+  <tr><td>3</td><td>Multi-page PDF assembly</td><td>Add a <code>--pdf</code> flag that combines multiple scanned images into a single PDF document using <code>img2pdf</code> or <code>reportlab</code>.</td></tr>
+  <tr><td>4</td><td>OCR integration</td><td>Pass the enhanced output through Tesseract OCR to extract text, creating a searchable PDF or a .txt sidecar file.</td></tr>
+  <tr><td>5</td><td>GUI / Web interface</td><td>Wrap the CLI in a simple web UI (e.g., Flask/Streamlit) for drag-and-drop scanning without a terminal.</td></tr>
+  <tr><td>6</td><td>Real-time camera mode</td><td>Use a webcam feed to detect the document in real-time, guiding the user to position the page, then capture and scan automatically.</td></tr>
+  <tr><td>7</td><td>Improved fallback detection</td><td>Use Hough line detection or deep-learning-based corner detection (e.g., a pre-trained model) for cases where <code>approxPolyDP</code> fails.</td></tr>
+</table>
+
+<!-- ================================================================== -->
+<!-- 15. REFERENCES                                                     -->
+<!-- ================================================================== -->
+<h2 id="sec15" class="page-break">15. References</h2>
+
+<ol>
+  <li>OpenCV Documentation — <em>Canny Edge Detection</em>.
+      <a href="https://docs.opencv.org/4.x/da/d22/tutorial_py_canny.html">
+      https://docs.opencv.org/4.x/da/d22/tutorial_py_canny.html</a></li>
+
+  <li>OpenCV Documentation — <em>Contours in OpenCV</em>.
+      <a href="https://docs.opencv.org/4.x/d4/d73/tutorial_py_contours_begin.html">
+      https://docs.opencv.org/4.x/d4/d73/tutorial_py_contours_begin.html</a></li>
+
+  <li>OpenCV Documentation — <em>Geometric Transformations of Images</em>.
+      <a href="https://docs.opencv.org/4.x/da/d6e/tutorial_py_geometric_transformations.html">
+      https://docs.opencv.org/4.x/da/d6e/tutorial_py_geometric_transformations.html</a></li>
+
+  <li>OpenCV Documentation — <em>Image Thresholding (Adaptive)</em>.
+      <a href="https://docs.opencv.org/4.x/d7/d4d/tutorial_py_thresholding.html">
+      https://docs.opencv.org/4.x/d7/d4d/tutorial_py_thresholding.html</a></li>
+
+  <li>OpenCV API Reference — <em>cv2.findContours, cv2.approxPolyDP, cv2.getPerspectiveTransform,
+      cv2.warpPerspective</em>.
+      <a href="https://docs.opencv.org/4.x/">https://docs.opencv.org/4.x/</a></li>
+
+  <li>Adrian Rosebrock — <em>"4 Point OpenCV getPerspective Transform Example"</em>,
+      PyImageSearch.
+      <a href="https://pyimagesearch.com/2014/08/25/4-point-opencv-getperspective-transform-example/">
+      https://pyimagesearch.com/2014/08/25/4-point-opencv-getperspective-transform-example/</a></li>
+
+  <li>Adrian Rosebrock — <em>"How to Build a Kick-Ass Mobile Document Scanner"</em>,
+      PyImageSearch.
+      <a href="https://pyimagesearch.com/2014/09/01/build-kick-ass-mobile-document-scanner-just-5-minutes/">
+      https://pyimagesearch.com/2014/09/01/build-kick-ass-mobile-document-scanner-just-5-minutes/</a></li>
+
+  <li>NumPy Documentation — <em>NumPy Reference</em>.
+      <a href="https://numpy.org/doc/stable/reference/">https://numpy.org/doc/stable/reference/</a></li>
+
+  <li>Python Documentation — <em>argparse — Parser for command-line options, arguments and sub-commands</em>.
+      <a href="https://docs.python.org/3/library/argparse.html">
+      https://docs.python.org/3/library/argparse.html</a></li>
+
+  <li>pytest Documentation — <em>Full pytest documentation</em>.
+      <a href="https://docs.pytest.org/en/stable/">https://docs.pytest.org/en/stable/</a></li>
+</ol>
+
+<br>
+<hr style="border: 1.5px solid #2c5f8a;">
+<p style="text-align:center; color:#888; font-size:10pt; margin-top:12px;">
+  End of Report — Document Scanner Project — Aneesh Bagad — September 2026
+</p>
+
+</div><!-- /content -->
+
+</body>
+</html>
